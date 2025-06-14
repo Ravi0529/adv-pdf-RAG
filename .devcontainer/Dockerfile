@@ -8,4 +8,6 @@ RUN sudo apt-get update && \
 
 RUN apt-get install -y poppler-utils
 
+RUN apt-get install -y poppler-utils
+
 RUN pip install --upgrade pip
