@@ -43,28 +43,29 @@ async def process_file(id: str, file_path: str):
 
     images_base64 = [encode_image(img) for img in images]
 
-    result = client.responses.create(
+    result = client.chat.completions.create(
         model="gpt-4.1",
-        input=[
+        messages=[
             {
                 "role": "user",
                 "content": [
                     {
-                        "type": "input_text",
+                        "type": "text",
                         "text": "Based on the resume below, Roast this resume"
                     },
                     {
-                        "type": "output_text",
-                        "image_url": f"data:image/jpeg;base64,{images_base64}"
+                        "type": "image_url",
+                        # flake8: noqa
+                        "image_url": {"url": f"data:image/jpeg;base64,{images_base64}"}
                     }
                 ]
             }
         ]
     )
 
-    await files_collection.upload_one({"_id": ObjectId(id)}, {
+    await files_collection.update_one({"_id": ObjectId(id)}, {
         "$set": {
             "status": "processed",
-            "result": result.output_text
+            "result": result.choices[0].message.content
         }
     })
